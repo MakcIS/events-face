@@ -11,6 +11,7 @@ class EventsPagination(CursorPagination):
     page_size = 10
 
 
+# Подумать над кешированием для снижения нагрузки на БД
 class EventsList(ListAPIView):
     serializer_class = EventsSerializer
     filter_backends = [OrderingFilter, SearchFilter]

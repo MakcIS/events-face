@@ -5,9 +5,11 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
+    "aiohttp>=3.11.15",
     "django>=5.1.7",
     "djangorestframework-simplejwt>=5.5.0",
     "drf-spectacular>=0.28.0",
+    "requests>=2.32.3",
     "ruff>=0.11.2",
 ]
 
