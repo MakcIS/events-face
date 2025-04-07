@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from .models import Events, Places
+from src.events.models import Events, Places
 
 
 class PlaceSerializer(serializers.ModelSerializer):

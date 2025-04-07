@@ -6,8 +6,9 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.serializers import TokenRefreshSerializer
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.exceptions import TokenError
 
-from .serializer import CreateUserSerializer
+from src.authentication.serializer import CreateUserSerializer
 
 
 class CreateNewUser(CreateAPIView):
@@ -15,38 +16,32 @@ class CreateNewUser(CreateAPIView):
 
     def create(self, request: Request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
-        if serializer.is_valid():
-            user = serializer.save()
+        serializer.is_valid(raise_exception=True)
+        user = serializer.save()
 
-            refresh_token = RefreshToken.for_user(user)
-            access_token = refresh_token.access_token
+        refresh_token = RefreshToken.for_user(user)
+        access_token = refresh_token.access_token
 
-            response = {
-                "message": "User created successfully",
-                "access_token": f"{access_token}",
-                "refresh_token": f"{refresh_token}",
-            }
+        response = {
+            "message": "User created successfully",
+            "access_token": f"{access_token}",
+            "refresh_token": f"{refresh_token}",
+        }
 
-            return Response(response, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        return Response(response, status=status.HTTP_201_CREATED)
+
 
 
 class LogoutView(APIView):
     permission_classes = [IsAuthenticated]
-    serializer_class = TokenRefreshSerializer
+    serializer_class = TokenRefreshSerializer #Это только для документации
 
     def post(self, request: Request):
-        token = request.data.get("refresh", None)
-        if token is None:
-            return Response(
-                {"error": "Токен не передан"}, status=status.HTTP_400_BAD_REQUEST
-            )
         try:
+            token = request.data.get("refresh")
             token = RefreshToken(token)
             token.blacklist()
+
             return Response({"detail": "Вы успешно вышли"}, status=status.HTTP_200_OK)
-        except Exception:
-            return Response(
-                {"error": "Не верный токен"}, status=status.HTTP_401_UNAUTHORIZED
-            )
+        except TokenError:
+            return Response({"error": "Invalid token"}, status=status.HTTP_401_UNAUTHORIZED)

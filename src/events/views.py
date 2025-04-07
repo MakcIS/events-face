@@ -3,8 +3,8 @@ from rest_framework.generics import ListAPIView
 from rest_framework.pagination import CursorPagination
 from rest_framework.permissions import IsAuthenticated
 
-from .models import Events
-from .serializer import EventsSerializer
+from src.events.models import Events
+from src.events.serializer import EventsSerializer
 
 
 class EventsPagination(CursorPagination):
@@ -13,6 +13,7 @@ class EventsPagination(CursorPagination):
 
 # Подумать над кешированием для снижения нагрузки на БД
 class EventsList(ListAPIView):
+    queryset = Events.objects.select_related("place").filter(status="open")
     serializer_class = EventsSerializer
     filter_backends = [OrderingFilter, SearchFilter]
     pagination_class = EventsPagination
@@ -21,6 +22,3 @@ class EventsList(ListAPIView):
     ordering_fields = ["date"]
     ordering = ["date"]
 
-    def get_queryset(self):
-        data = Events.objects.select_related("place").filter(status="open")
-        return data

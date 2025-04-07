@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import EventsSync
+from src.sync.models import EventsSync
 
 
 @admin.register(EventsSync)

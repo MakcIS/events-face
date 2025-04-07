@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Events, Places
+from src.events.models import Events, Places
 
 
 @admin.register(Places)
